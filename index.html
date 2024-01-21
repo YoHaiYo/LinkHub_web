@@ -21,6 +21,7 @@
       <input type="url" id="siteUrl" name="siteUrl"><br>
   
       <button type="button" onclick="saveMemo()">저장</button>
+      <button type="button" onclick="deleteAllMemos()">전체 삭제</button>
     </form>
 
   <hr>
@@ -95,14 +96,21 @@
       const listItem = document.createElement('li');
       const memoLink = document.createElement('a');
       const deleteButton = document.createElement('button');
+      const titleParagraph = document.createElement('p');
+      const contentParagraph = document.createElement('p');
 
-      memoLink.textContent = `제목: ${memo.t}, 내용: ${memo.c}, 사이트 URL: ${memo.u}`;      
+      titleParagraph.textContent = `제목: ${memo.t}`;
+      contentParagraph.textContent = `내용: ${memo.c}`;
+
+      memoLink.innerHTML = '바로가기';
       memoLink.href = "https://" + memo.u; // url에 빼고 저장한 https://를 다시 붙여주어 제대로된 링크값으로 바꾸기
       memoLink.target = "_blank" // 새창으로 열기 추가
 
       deleteButton.textContent = '삭제';
       deleteButton.onclick = () => deleteMemo(index); // 삭제 버튼 클릭 시 해당 메모 삭제
 
+      listItem.appendChild(titleParagraph);
+      listItem.appendChild(contentParagraph);
       listItem.appendChild(memoLink);
       listItem.appendChild(deleteButton);
       memoListElement.appendChild(listItem);
@@ -130,6 +138,23 @@
       updateMemoList();
     }
   }
+
+  function deleteAllMemos() {
+    const memoList = getMemoList();
+
+    if (memoList.length > 0) {
+        if (confirm("전체 메모를 삭제하시겠습니까?")) {
+            // 전체 메모 삭제
+            const params = new URLSearchParams();
+            window.history.pushState({}, null, `?${params.toString()}`);
+
+            // 메모 목록 업데이트
+            updateMemoList();
+        }
+    } else {
+        alert("삭제할 메모가 없습니다.");
+    }
+}
 
   // 페이지 로드 시 메모 목록 업데이트
   window.addEventListener('load', updateMemoList);
