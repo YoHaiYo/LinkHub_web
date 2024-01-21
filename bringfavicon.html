@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favicon Viewer</title>
+</head>
+<body>
+    <label for="urlInput">Enter URL:</label>
+    <input type="text" id="urlInput" placeholder="Enter URL">
+    <button onclick="loadFavicon()">Load Favicon</button>
+    <div id="faviconContainer"></div>
+
+    <script>
+        function loadFavicon() {
+            const urlInput = document.getElementById('urlInput').value;
+            const faviconContainer = document.getElementById('faviconContainer');
+
+            // Clear previous favicon
+            faviconContainer.innerHTML = '';
+
+            // Create an image element
+            const img = document.createElement('img');
+
+            // Try to load favicon.ico from the root directory
+            img.src = `${urlInput}/favicon.ico`;
+
+            // Set some styles for better display
+            img.style.width = '64px';
+            img.style.height = '64px';
+
+            // If favicon.ico is not found, use Google favicon service
+            // img.onerror = function() {
+            //     img.src = `https://www.google.com/s2/favicons?sz=64&domain=${urlInput}`;
+            // };
+
+            // Append the image to the container
+            faviconContainer.appendChild(img);
+        }
+    </script>
+</body>
+</html>

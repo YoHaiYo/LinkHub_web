@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Hub</title>
+</head>
+<body>
+
+  <h1><a href="/">Link Hub</a></h1>
+ 
+    <!-- 입력 폼 -->
+    <form id="memoForm">
+      <label for="title">제목:</label>
+      <input type="text" id="title" name="title" required><br>
+  
+      <label for="content">내용:</label>
+      <textarea id="content" name="content" rows="4" required></textarea><br>
+  
+      <label for="siteUrl">사이트 URL:</label>
+      <input type="url" id="siteUrl" name="siteUrl"><br>
+  
+      <button type="button" onclick="saveMemo()">저장</button>
+    </form>
+
+  <hr>
+
+  <!-- 메모 목록 -->
+  <ul id="memoList"></ul>
+<!-- 수정된 코드 -->
+
+<script>  
+
+     function saveMemo() {
+    // 입력값 가져오기
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+    let siteUrl = document.getElementById('siteUrl').value;
+
+    // 기존 메모 목록 가져오기
+    const memoList = getMemoList();
+
+    // 맨 끝에 있는 '/' 제거
+    siteUrl = siteUrl.replace(/\/$/, '');
+
+    // 새로운 메모 추가
+    const memo = {
+      t: title,
+      c: content,
+      u: siteUrl.replace('https://', '') // https:// 제거
+    };
+    memoList.push(memo);
+
+    // URL 업데이트
+    const params = new URLSearchParams();
+    memoList.forEach((memo, index) => {
+      params.set(`t${index + 1}`, memo.t);
+      params.set(`c${index + 1}`, memo.c);
+      params.set(`u${index + 1}`, memo.u);
+    });
+    window.history.pushState({}, null, `?${params.toString()}`);
+
+    // 메모 목록 업데이트
+    updateMemoList();
+  }
+
+  function getMemoList() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let memoList = [];
+    let index = 1;
+
+    // t1, c1, u1부터 순서대로 존재하는 동안 메모를 가져와 목록에 추가
+    while (urlParams.has(`t${index}`)) {
+      const title = urlParams.get(`t${index}`) || '';
+      const content = urlParams.get(`c${index}`) || '';
+      const siteUrl = urlParams.get(`u${index}`) || '';
+
+      memoList.push({ t: title, c: content, u: siteUrl });
+
+      index++;
+    }
+
+    return memoList;
+  }
+
+  function updateMemoList() {
+    const memoListElement = document.getElementById('memoList');
+    memoListElement.innerHTML = '';
+
+    // 현재 URL의 쿼리 매개변수에서 메모 목록 가져오기
+    const memoList = getMemoList();
+
+    // 메모 목록 출력
+    memoList.forEach((memo, index) => {
+      const listItem = document.createElement('li');
+      const memoLink = document.createElement('a');
+      const deleteButton = document.createElement('button');
+
+      memoLink.textContent = `제목: ${memo.t}, 내용: ${memo.c}, 사이트 URL: ${memo.u}`;      
+      memoLink.href = "https://" + memo.u; // url에 빼고 저장한 https://를 다시 붙여주어 제대로된 링크값으로 바꾸기
+      memoLink.target = "_blank" // 새창으로 열기 추가
+
+      deleteButton.textContent = '삭제';
+      deleteButton.onclick = () => deleteMemo(index); // 삭제 버튼 클릭 시 해당 메모 삭제
+
+      listItem.appendChild(memoLink);
+      listItem.appendChild(deleteButton);
+      memoListElement.appendChild(listItem);
+    });
+  }
+
+  function deleteMemo(index) {
+    const memoList = getMemoList();
+
+    if (index >= 0 && index < memoList.length) {
+      memoList.splice(index, 1); // 해당 인덱스의 메모 삭제
+      const params = new URLSearchParams();
+
+      // 업데이트된 메모 목록을 URL에 반영
+      memoList.forEach((memo, index) => {
+        params.set(`t${index + 1}`, memo.t);
+        params.set(`c${index + 1}`, memo.c);
+        params.set(`u${index + 1}`, memo.u);
+      });
+
+      // 쿼리 매개변수로 업데이트된 메모 목록을 URL에 반영
+      window.history.pushState({}, null, `?${params.toString()}`);
+
+      // 메모 목록 업데이트
+      updateMemoList();
+    }
+  }
+
+  // 페이지 로드 시 메모 목록 업데이트
+  window.addEventListener('load', updateMemoList);
+
+  // 앵커 링크 클릭 시 해당 메모의 URL로 이동
+  window.addEventListener('hashchange', () => {
+    const memoList = getMemoList();
+    // const memoIndex = parseInt(window.location.hash.substring(1));
+
+    if (!isNaN(memoIndex) && memoIndex >= 0 && memoIndex < memoList.length) {
+      const memo = memoList[memoIndex];
+      window.location.href = `${memo.u}`;
+    }
+  });
+</script>
+
+  
+
+</body>
+</html>

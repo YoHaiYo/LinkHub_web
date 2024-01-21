@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <title>jQuery</title>
+    <meta name="author" content="JB">
+    <meta property="og:image" content="abc.png">
+    <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+      $( document ).ready( function() {
+        var jbMeta1 = $( 'meta[name="author"]' ).attr( 'content' );
+        var jbMeta2 = $( 'meta[property="og:image"]' ).attr( 'content' );
+        $( 'body' ).append( jbMeta1 + ', ' + jbMeta2 );
+      } );
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
